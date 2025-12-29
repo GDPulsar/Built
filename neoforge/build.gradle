@@ -1,5 +1,8 @@
 plugins {
     id 'com.github.johnrengelman.shadow'
+    id "com.modrinth.minotaur" version "2.+"
+    id 'java-library'
+    id 'maven-publish'
 }
 
 architectury {
@@ -21,6 +24,23 @@ configurations {
     shadowBundle {
         canBeResolved = true
         canBeConsumed = false
+    }
+}
+
+modrinth {
+    token = findProperty("modrinth.token")
+    projectId = "built!"
+    versionNumber = project.version
+    versionType = "alpha"
+    versionName = "Built NeoForge $mod_version"
+
+    uploadFile = project(":neoforge").tasks.remapJar
+
+    gameVersions = ["1.21.1"]
+    loaders = ["neoforge"]
+
+    dependencies {
+        required.project "architectury-api"
     }
 }
 
@@ -55,4 +75,47 @@ shadowJar {
 
 remapJar {
     input.set shadowJar.archiveFile
+}
+
+publishing {
+    publications {
+        mavenCommon(MavenPublication) {
+            from components.java
+
+            artifactId = "built-neoforge"
+
+            pom {
+                name = "Built! NeoForge"
+                description = "NeoForge Architectury package for Built!"
+                url = "https://github.com/GDPulsar/Built"
+
+                developers {
+                    developer {
+                        id = "gdpulsar"
+                        name = "Pulsar"
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:git://github.com/GDPulsar/Built.git"
+                    developerConnection = "scm:git:ssh://github.com:GDPulsar/Built.git"
+                    url = "https://github.com/GDPulsar/Built"
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/GDPulsar/Librarby")
+            credentials {
+                username = findProperty("gpr.user")
+                password = findProperty("gpr.token")
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
 }

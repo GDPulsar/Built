@@ -27,7 +27,7 @@ public class MultiblockRegistry {
         return networks.get(id);
     }
 
-    public static <T extends MultiblockNetwork> MultiblockNetworkType<T> register(MultiblockNetworkType<T> networkType) {
+    public static <T extends MultiblockNetwork> MultiblockNetworkType<T> registerNetworked(MultiblockNetworkType<T> networkType) {
         networks.put(networkType.getId(), networkType);
         return networkType;
     }

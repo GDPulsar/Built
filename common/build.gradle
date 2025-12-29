@@ -1,12 +1,57 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
 architectury {
     common rootProject.enabled_platforms.split(',')
 }
 
 dependencies {
-    // We depend on Fabric Loader here to use the Fabric @Environment annotations,
-    // which get remapped to the correct annotations on each platform.
-    // Do NOT use other classes from Fabric Loader.
     modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
 
     modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
+}
+
+publishing {
+    publications {
+        mavenCommon(MavenPublication) {
+            from components.java
+
+            artifactId = "built-common"
+
+            pom {
+                name = "Built! Common"
+                description = "Common Architectury package for Built!"
+                url = "https://github.com/GDPulsar/Built"
+
+                developers {
+                    developer {
+                        id = "gdpulsar"
+                        name = "Pulsar"
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:git://github.com/GDPulsar/Built.git"
+                    developerConnection = "scm:git:ssh://github.com:GDPulsar/Built.git"
+                    url = "https://github.com/GDPulsar/Built"
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/GDPulsar/Librarby")
+            credentials {
+                username = findProperty("gpr.user")
+                password = findProperty("gpr.token")
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
 }
